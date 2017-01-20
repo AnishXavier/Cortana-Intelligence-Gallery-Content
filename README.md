@@ -8,8 +8,9 @@ Tutorials and sample code shown in the Cortana Intelligence Gallery (https://gal
 
 ###Tutorials
 * [Building Predictive Pipelines Incorporating Azure Data Lake and Azure Machine Learning](Tutorials/Data-Lake)
+* [Deep Learning for Text Classification in Azure GPU-Accelerated Infrastructure](Tutorials/Deep-Learning-for-Text-Classification-in-Azure)
 * [MRS for SAS Users](Tutorials/MRS-for-SAS-Users)
-* [Building Deep Neural Networks in the Cloud with Azure GPU VMs, MXNet and Microsoft R Server](Tutorials/Tutorials/MXNet-Azure-GPU)
+* [Building Deep Neural Networks in the Cloud with Azure GPU VMs, MXNet and Microsoft R Server](Tutorials/MXNet-Azure-GPU)
 * [R for SAS Users](Tutorials/R-for-SAS-Users)
 * [Setting up predictive analytics pipelines using Azure SQL Data Warehouse](Tutorials/SQL-Data-Warehouse)
 * [Create an End-to-End (E2E) Deployment-ready Data Pipeline for Consuming Azure Services: A Step-by-Step Guide](Tutorials/Step-by-Step Guide for End-to-End Pipeline Deployment)
