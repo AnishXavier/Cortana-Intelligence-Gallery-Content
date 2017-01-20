@@ -17,7 +17,7 @@ parse_args <- function() {
   parser$add_argument('--network', type='character', default='crepe',
                       choices = c('crepe', 'vdcnn','vdcnn_residual'),
                       help = 'the cnn to use')
-  parser$add_argument('--data-dir', type='character', default='../../data',
+  parser$add_argument('--data-dir', type='character', default='../data',
                       help='the input data directory')
   parser$add_argument('--train-dataset', type='character', default="train.csv",
                       help='train dataset name')
