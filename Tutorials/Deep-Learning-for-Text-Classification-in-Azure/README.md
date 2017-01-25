@@ -75,9 +75,9 @@ This dataset consists of a training set of 2.38 million sentences, a test set of
 
 ## Development of Cloud Infrastructure for Text Classification in Azure
 
-Once we have the DNN trained model, we can use the Azure cloud infrastructure to operationalize the solution and provide text classification as a web service. The logic of the application is managed via a python service in the server, that gets the sentence as input and returns the classification score. 
+Once we have the DNN trained model, we can use the Azure cloud infrastructure to operationalize the solution and provide text classification as a web service. The logic of the application is managed via a python API running on [flask](!http://flask.pocoo.org/docs/0.12/), that gets the sentence as input and returns the classification score. 
 
-The front end is managed by an AngularJS application, that is in charge of sending the information to the server, receiving the response and showing it to the user. For managing the communications between the front and back end, we used a API programmed in Flask. 
+The front end is managed by an AngularJS application, that is in charge of sending the information to the server, receiving the response and showing it to the user.
 
 We include the Crepe model for text classification, using the Amazon categories dataset and the same architecture trained for sentiment analysis, using the Amazon polarity dataset.
 
@@ -100,4 +100,77 @@ Let’s analyze now some results for the sentiment analysis API and see what hap
 The Crepe model shows a very positive sentiment while Cortana shows a neutral sentiment. This makes sense if we understand the context of each model. The Crepe model was trained in the Amazon Polarity dataset. In that scenario, if a product arrives as expected, we can state that it is a positive situation. On the contrary, Cortana text API was trained with a different dataset, and probably tuned to cope with broader situations. In a general scenario, something arriving as expected could be seen as a neutral situation.  These results highlight the fact that the result of a machine learning model is closely related to the context in which it has been trained.
 
 
-You can download the code of the Web app [here](!https://mxnetstorage.blob.core.windows.net/public/nlp/NLPWebApp.zip). It contains the pre-trained model for sentiment analysis and category classification. You will need to download the cudnn DLL library from the [nvidia website](!https://developer.nvidia.com/cudnn) and put it in `MXNET/3rdparty/cudnn`. You will need to put your own API key for the Microsoft data market in `FlaskWebProject/model.py:168`. You can then deploy the code to [Azure Web Apps](!https://azure.microsoft.com/en-us/services/app-service/web/), provided your instance has Python 2.7 (64 bit) installed and at least 2GB of RAM. 
+In the following section we will show you how to deploy a simplified version of the web app presented above.
+
+### Prerequisites to deploy a MXNET model on [Azure Web Apps](!https://azure.microsoft.com/en-us/services/app-service/web/)
+
+- Have the latest `Azure cli` installed and in your `PATH` environement variable
+- Have `git` installed and in your `PATH`
+- Register on the [NVIDIA cuDNN website](!https://developer.nvidia.com/cudnn) to be able to use the cuDNN library, and download `cudnn64_70.dll`
+- Download the code of a simplified version of the webapp [here](!https://mxnetstorage.blob.core.windows.net/public/nlp/NLPWebApp.zip) and unzip it. It contains the pre-trained model for sentiment analysis. The final result is visible [here](!https://mxnetdeepapi.azurewebsites.net/)
+
+### CuDNN
+
+- Add the downloaded `cudnn64_70.dll` to `MXNET\3rdparty\cudnn`
+- __zip the MXNET folder__ so that there is a `MXNET.zip` file at the root of your NLPWebApp folder containing the content of the `MXNET` folder.
+
+### Create an Azure App Service Website
+
+- On the command line, make sure your working directory is the `NLPWebApp` directory
+```
+cd NLPWebApp
+```
+
+- First login on your subscription using the Azure CLI in linux or windows
+```
+azure login
+azure config mode asm
+```
+
+- Create an Azure App Service Website (if you don't have `git` in your path you will have an error and you will need to add the remote manually)
+```
+azure site create --git <your_app_name>
+``` 
+
+### Modify your Azure App Service to support 64 bit, and install python 2.7.11 64 bit
+- In the portal, navigate to your newly created Azure App Service
+- Update your plan to use at least the B1 plan, I recommend using the B2 plan or the S2 plan to benefit from autoscale
+- In the __Application Settings__ menu, set the app to _64 bits_, and _Always On_
+- In the __Extension__ menu, add the _Python 2.7.11 x64_ extension from Steve Dower. This will install a 64 bit version of Python 2.7.11
+
+### Deploy your app to the cloud
+- Inside the folder of your application run the following command
+```
+git push azure master
+```
+
+### Test the app
+- The application should be running at : http://<your_app_name>.azurewebsites.net
+- You can call the API using the /api/sentiment endpoint and sending a POST request with the following payload:
+```
+{
+    "sentence": "This is a test for the API"
+}
+```
+
+### Modifying the app to deploy your own model
+
+#### deploy.cmd
+- This is the command file that is run after deployment, you can update it if you need to install a different version of MXNET for example or perform extra post-deployment actions
+
+#### requirements.txt
+- This file list all the pip dependencies necessary for your flask app to run
+- If your dependencies are not pure python, it is recommended to install them via a wheel (see numpy and pandas for example), pre-compiled for the windows 64 bit, python 2.7
+
+#### web.2.7.config
+- This file contains the webconfig for the IIS running on the Azure App Service instances. You can use this one or modify it to use the fastcgi protocol if that is more suitable for your use-case.
+
+#### Model/crepe_amazon_sentiment-*
+- These files contains the symbol definition of your network and the weights of the model, they are necessary to load a trained MXNET model in memory
+- Replace them with your own files and update the model.py file in the WebApp folder
+
+#### WebApp/model.py
+- That's where the model is loaded and the routes are defined, use this file to add more models or more routes to your API
+
+#### WebApp/index.html
+- If you want your API to have a frontend, or documentation, you can define static pages as well, the assets are under static/assets/*
