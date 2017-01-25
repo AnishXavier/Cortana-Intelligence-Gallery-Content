@@ -12,7 +12,7 @@ The tools we will use in this entry are:
 * [Anaconda](https://www.continuum.io/downloads) with Python version 3.5.
 * [Azure Cloud Services](https://azure.microsoft.com/en-gb/services/cloud-services/).
 * [CUDA](https://developer.nvidia.com/cuda-toolkit) version 8.0. 
-* [CuDNN](https://developer.nvidia.com/cudnn) version 5.1.
+* [cuDNN](https://developer.nvidia.com/cudnn) version 5.1.
 * [Math Kernel Library](https://software.intel.com/en-us/intel-mkl) (MKL) version 11.3
 
 To configure and install the environment please refer to this [blog post](https://blogs.technet.microsoft.com/machinelearning/2016/09/15/building-deep-neural-networks-in-the-cloud-with-azure-gpu-vms-mxnet-and-microsoft-r-server/).
@@ -75,11 +75,11 @@ In the next figure we show the results of computing the Crepe model on the Amazo
 
 This dataset consists of a training set of 2.38 million sentences, a test set of 420,000 sentences, divided in 7 categories: “Books”, “Clothing, Shoes & Jewelry”, “Electronics”, “Health & Personal Care”, “Home & Kitchen”, “Movies & TV” and “Sports & Outdoors”. The model has been trained for 10 epochs in an Azure NC24 with 4 K80 Tesla GPUs. The training time was around 1 day.
 
-We also provide several examples written in python. The [first example](./python/01%20-%20LeNet%20-%20MNIST%20Walkthrough.ipynb) shows how to create a custom iterator to train a DNN. The [second example](./python/02%20-%20Crepe%20-%20Amazon.ipynb) explains how to compute the Crepe model in the [Amazon sentiment dataset](https://mxnetstorage.blob.core.windows.net/public/nlp/amazon_review_polarity_csv.tar.gz). In the [third example](./python/03%20-%20Crepe%20-%20Amazon%20(advc).py) we show how to train the Crepe model in the same dataset, but this time we feed the data asynchronously using a pre-fetch method. Finally, in the [fourth example](./python/04%20-%20VDCNN%20-%20Amazon(advc).py) we demonstrate how to create the VDCNN architecture and implemented a k-max pooling layer using MXNet API.
+We also provide several examples written in python. The [first example](./python/01%20-%20LeNet%20-%20MNIST%20Walkthrough.ipynb) shows how to create a custom iterator to train a DNN. The [second example](./python/02%20-%20Crepe%20-%20Amazon.ipynb) explains how to compute the Crepe model in the [Amazon sentiment dataset](https://mxnetstorage.blob.core.windows.net/public/nlp/amazon_review_polarity_csv.tar.gz). This dataset contains a train set of 3.6 million sentences and a test set of 400,000. It has two classes, positive and negative. In the [third example](./python/03%20-%20Crepe%20-%20Amazon%20(advc).py) we show how to train the Crepe model in the same dataset, but this time we feed the data asynchronously using a pre-fetch method. Finally, in the [fourth example](./python/04%20-%20VDCNN%20-%20Amazon(advc).py) we demonstrate how to create the VDCNN architecture and implemented a k-max pooling layer using MXNet API. The training of the Crepe model for 10 epochs in 1 GPU is about 2 days and with the VDCNN model is about 5 days.
 
 ## Development of Cloud Infrastructure for Text Classification in Azure
 
-Once we have the DNN trained model, we can use the Azure cloud infrastructure to operationalize the solution and provide text classification as a web service. The logic of the application is managed via a python API running on [flask](!http://flask.pocoo.org/docs/0.12/), that gets the sentence as input and returns the classification score. 
+Once we have the DNN trained model, we can use [Azure Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/) to operationalize the solution and provide text classification as a web service. The logic of the application is managed via a python API running on [Flask](http://flask.pocoo.org/docs/0.12/), that gets the sentence as input and returns the classification score. 
 
 The front end is managed by an AngularJS application, that is in charge of sending the information to the server, receiving the response and showing it to the user.
 
@@ -106,17 +106,18 @@ The Crepe model shows a very positive sentiment while Cortana shows a neutral se
 
 In the following section we will show you how to deploy a [simplified version](https://mxnetdeepapi.azurewebsites.net/) of the web app presented above.
 
-### Prerequisites to deploy a MXNet model on [Azure Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/)
+### Prerequisites to deploy a MXNet model on Azure Web Apps
 
-- Have the latest `Azure cli` installed and in your `PATH` environement variable.
+- Create an account in [Azure Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/)
+- Have the latest `Azure cli` installed and in your `PATH` environment variable.
 - Have `git` installed and in your `PATH`.
-- Register on the [NVIDIA cuDNN website](https://developer.nvidia.com/cudnn) to be able to use the CuDNN library, and download `cudnn64_70.dll`.
+- Register on the [NVIDIA cuDNN website](https://developer.nvidia.com/cudnn) to be able to use the cuDNN library, and download `cudnn64_70.dll`.
 - Download the code of a simplified version of the webapp [here](!https://mxnetstorage.blob.core.windows.net/public/nlp/NLPWebApp.zip) and unzip it. It contains the pre-trained model for sentiment analysis. The final result is visible [here](https://mxnetdeepapi.azurewebsites.net/).
 
-### CuDNN
+### cuDNN
 
 - Add the downloaded `cudnn64_70.dll` to `MXNET\3rdparty\cudnn`
-- __zip the MXNet folder__ so that there is a `MXNET.zip` file at the root of your NLPWebApp folder containing the content of the `MXNET` folder.
+- __zip the MXNet folder__ so that there is a `MXNET.zip` file at the root of your `NLPWebApp` folder containing the content of the `MXNET` folder.
 
 ### Create an Azure App Service Website
 
@@ -138,8 +139,8 @@ azure site create --git <your_app_name>
 
 ### Modify your Azure App Service to support 64 bit, and install python 2.7.11 64 bit
 - In the portal, navigate to your newly created Azure App Service.
-- Update your plan to use at least the B1 plan, I recommend using the B2 plan or the S2 plan to benefit from autoscale.
-- In the __Application Settings__ menu, set the app to _64 bits_, and _Always On_
+- Update your plan to use at least the B1 plan (we recommend using the B2 plan or the S2 plan to benefit from autoscale).
+- In the __Application Settings__ menu, set the app to _64 bits_, and _Always On_.
 - In the __Extension__ menu, add the _Python 2.7.11 x64_ extension from Steve Dower. This will install a 64 bit version of Python 2.7.11.
 
 ### Deploy your app to the cloud
