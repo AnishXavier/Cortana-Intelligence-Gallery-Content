@@ -2,7 +2,7 @@
 
 Natural Language Processing (NLP) is one of the fields in which deep learning has made a significant progress. Specifically, the area of text classification, where the objective is to categorize text or sentences into classes, has attracted the interest of both industry and academia. One of the most interesting applications is sentiment analysis, whose objective is to determine whether the attitude expressed in a piece of text towards a particular topic is positive, negative or neutral. This information can be used by companies to define marketing strategy, generate leads or improve customer service. 
 
-In this notebook we will demonstrate how to use Deep Neural Networks (DNNs) in a text classification problem. We will explain how to generate an end-to-end pipeline to train a DNN for text classification and prepare the model for production so it can be queried by a user to classify sentences via a web service. 
+In this notebook we will demonstrate how to use Deep Neural Networks (DNNs) in a text classification problem. We will explain how to generate an end-to-end pipeline to train a DNN for text classification and prepare the model for production, so it can be queried by a user to classify sentences via a web service. 
 
 The tools we will use in this entry are:
 
@@ -12,7 +12,7 @@ The tools we will use in this entry are:
 * [Anaconda](https://www.continuum.io/downloads) with Python version 3.5.
 * [Azure Cloud Services](https://azure.microsoft.com/en-gb/services/cloud-services/).
 * [CUDA](https://developer.nvidia.com/cuda-toolkit) version 8.0. 
-* [CuDNN](https://developer.nvidia.com/cudnn) version 5.1
+* [CuDNN](https://developer.nvidia.com/cudnn) version 5.1.
 * [Math Kernel Library](https://software.intel.com/en-us/intel-mkl) (MKL) version 11.3
 
 To configure and install the environment please refer to this [blog post](https://blogs.technet.microsoft.com/machinelearning/2016/09/15/building-deep-neural-networks-in-the-cloud-with-azure-gpu-vms-mxnet-and-microsoft-r-server/).
@@ -24,15 +24,15 @@ In the next figure we show the complete architecture:
 <img src="https://mxnetstorage.blob.core.windows.net/public/nlp/architecture.png" alt="architecture" width="60%"/>
 </p>
 
-As it can be seen in the Figure, the first step is to process the dataset. In most of the situations, the dataset will not fit in the memory of the VM we are using, so we must feed the data to the training process in batches: reading a data chuck, processing it to create a group of encoded images and freeing the memory before starting again. This process is programmed in R. Once the model is trained, we can host it in a VM and use it to classify sentences via a web service. We created a Python API that communicates a simple front end with the classification process. The front end is programmed in JavaScript and HTML, and provides a flexible environment to switch between different trained models.  
+As it can be seen in the Figure, the first step is to process the dataset. In most of the situations, the dataset will not fit in the memory of the VM we are using, so we must feed the data to the training process in batches: reading a data chunk, processing it to create a group of encoded images and freeing the memory before starting again. This process is programmed in R. Once the model is trained, we can host it in a VM and use it to classify sentences via a web service. We created a Python API that communicates a simple front end with the classification process. The front end is programmed in JavaScript and HTML, and provides a flexible environment to switch between different trained models.  
 
 ## Text Classification at Character Level
 
-The area of text classification has been developed mostly with machine learning models that use features at the word level. The idea of using deep learning for text classification at character level came first in 2015 with the [Crepe model](https://arxiv.org/abs/1509.01626). The following year the technique was developed further in the [VDCNN model](https://arxiv.org/abs/1606.01781) and the char-CRNN model. We implemented the code of the [Crepe model](./R/crepe_model.R) and the [VDCNN model](./R/vdcnn_model.R).  
+The area of text classification has been developed mostly with machine learning models that use features at the word level. The idea of using deep learning for text classification at character level came first in 2015 with the [Crepe model](https://arxiv.org/abs/1509.01626). The following year the technique was developed further in the [VDCNN model](https://arxiv.org/abs/1606.01781) and the [char-CRNN model](https://arxiv.org/abs/1602.00367). We implemented the code of the Crepe model ([R version](./R/crepe_model.R) and [python version](./python/03%20-%20Crepe%20-%20Amazon%20(advc).py)) and the VDCNN model ([R version](./R/vdcnn_model.R) and [python version](./python/04%20-%20VDCNN%20-%20Amazon(advc).py).  
 
 DNNs have achieved good results when used together with raw data, especially in computer vision where the inputs to the network are the pixels of the image, normally without any preprocessing. In an equivalent way, characters are the atomic representation of the sentence. 
 
-The encoding of each sentence is represented in the following figure. 
+The encoding of each sentence is represented in the following figure: 
 
 <p align="center">
 <img src="https://mxnetstorage.blob.core.windows.net/public/nlp/matrix_text.png" alt="Text encoding" width="60%"/>
@@ -44,13 +44,13 @@ Each sentence is transformed into a matrix, where the rows corresponds to a dict
 abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+ =<>()[]{}
 ```
 
-For each character in the sentence, we compute a 1 hot encoding, i.e., for each column, we assign a 1 to the corresponding row. As it is usually done when using images with DNNs, the size of the matrix is fixed. Therefore, all sentences are trimmed to a maximum of 1014 characters. In the case the sentence is shorter, the matrix is padded with spaces. At the end, each encoded sentence has a size of 69, which is the length of the vocabulary, times 1014, which is the length of the sentence.
+For each character in the sentence, we compute a 1 hot encoding vector, i.e., for each column, we assign a 1 to the corresponding row. As it is usually done when using images with DNNs, the size of the matrix is fixed. Therefore, all sentences are trimmed to a maximum of 1014 characters. In the case the sentence is shorter, the matrix is padded with spaces. At the end, each encoded sentence has a size of 69, which is the length of the vocabulary, times 1014, which is the length of the sentence.
 
 ## Convolution with Characters
 
-A convolution allows to generate hierarchical representations mapping from the inputs, to the internal layers, and to the outputs. Each layer sequentially extracts features from small windows of the input sequence and aggregates the information through an activation function. This windows, normally referred as kernels, propagates the local relationships of the data over the hidden layers. 
+A convolution allows to generate hierarchical representations mapping from the inputs, to the internal layers, and to the outputs. Each layer sequentially extracts features from small windows in the input sequence and aggregates the information through an activation function. These windows, normally referred as kernels, propagate the local relationships of the data over the hidden layers. 
 
-The next image represents an example of a kernel in an image and in a sentence. 
+The next image represents an example of a kernel in an image (left) and in a sentence (right). 
 
 <p align="center">
 <img src="https://mxnetstorage.blob.core.windows.net/public/nlp/kernel.png" alt="Kernel in images and sentences" width="60%"/>
@@ -58,7 +58,7 @@ The next image represents an example of a kernel in an image and in a sentence.
 
 As in can be seen in the figure, a kernel in an image has usually a size of `3x3`, `5x5` or `7x7`. A convolution of 3, 5 or 7 pixels can represent a small part of the image, like an edge or shape. 
 
-In a model like Crepe or VDCNN, the first convolution has the size of `3xn` or `7xn`, where n is the size of the vocabulary, perhaps because the average word is 7 characters. The subsequence convolutions have size of `3x1`, `5x1` or `7x1`, which can be loosely interpreted as a trigram approach. 
+In a model like Crepe or VDCNN, the first convolution has the size of `3xn` or `7xn`, where n is the size of the vocabulary, perhaps because the average word is 7 characters. The subsequence convolutions have size of `3x1`, which can be loosely interpreted as a trigram approach. Other options are kernels of `5x1` or `7x1`.
 
 In this entry, we analyze the Crepe model, composed by 9 layers (6 convolutional and 3 fully connected). To compute the model in R you have to type:
 
@@ -74,6 +74,8 @@ In the next figure we show the results of computing the Crepe model on the Amazo
 </p>
 
 This dataset consists of a training set of 2.38 million sentences, a test set of 420,000 sentences, divided in 7 categories: “Books”, “Clothing, Shoes & Jewelry”, “Electronics”, “Health & Personal Care”, “Home & Kitchen”, “Movies & TV” and “Sports & Outdoors”. The model has been trained for 10 epochs in an Azure NC24 with 4 K80 Tesla GPUs. The training time was around 1 day.
+
+We also provide several examples written in python. The [first example](./python/01%20-%20LeNet%20-%20MNIST%20Walkthrough.ipynb) shows how to create a custom iterator to train a DNN. The [second example](./python/02%20-%20Crepe%20-%20Amazon.ipynb) explains how to compute the Crepe model in the [Amazon sentiment dataset](https://mxnetstorage.blob.core.windows.net/public/nlp/amazon_review_polarity_csv.tar.gz). In the [third example](./python/03%20-%20Crepe%20-%20Amazon%20(advc).py) we show how to train the Crepe model in the same dataset, but this time we feed the data asynchronously using a pre-fetch method. Finally, in the [fourth example](./python/04%20-%20VDCNN%20-%20Amazon(advc).py) we demonstrate how to create the VDCNN architecture and implemented a k-max pooling layer using MXNet API.
 
 ## Development of Cloud Infrastructure for Text Classification in Azure
 
