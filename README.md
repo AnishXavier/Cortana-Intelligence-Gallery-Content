@@ -1,12 +1,12 @@
 # Cortana Intelligence Gallery Content
 Tutorials and sample code shown in the Cortana Intelligence Gallery (https://gallery.cortanaintelligence.com/) and other resources for [Azure](https://azure.microsoft.com).
 
-##Contents
+## Contents
 
-###Resources
+### Resources
 * [Phenotype prediction using FaST-LMM on Microsoft Azure's Linux Data Science Virtual Machine](Resources/Phenotype-Prediction) 
 
-###Tutorials
+### Tutorials
 * [Building Predictive Pipelines Incorporating Azure Data Lake and Azure Machine Learning](Tutorials/Data-Lake)
 * [Deep Learning for Text Classification in Azure GPU-Accelerated Infrastructure](Tutorials/Deep-Learning-for-Text-Classification-in-Azure)
 * [MRS for SAS Users](Tutorials/MRS-for-SAS-Users)
