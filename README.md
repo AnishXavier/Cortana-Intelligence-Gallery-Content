@@ -13,6 +13,6 @@ Tutorials and sample code shown in the Cortana Intelligence Gallery (https://gal
 * [Building Deep Neural Networks in the Cloud with Azure GPU VMs, MXNet and Microsoft R Server](Tutorials/MXNet-Azure-GPU)
 * [R for SAS Users](Tutorials/R-for-SAS-Users)
 * [Setting up predictive analytics pipelines using Azure SQL Data Warehouse](Tutorials/SQL-Data-Warehouse)
-* [Create an End-to-End (E2E )Deployment-ready Data Pipeline for Consuming Azure Services: A Step-by-Step Guide](Tutorials/Step-by-Step%20Guide%20for%20End-to-End%20Pipeline%20Deployment)
+* [Create an End-to-End (E2E) Deployment-ready Data Pipeline for Consuming Azure Services: A Step-by-Step Guide](Tutorials/Step-by-Step%20Guide%20for%20End-to-End%20Pipeline%20Deployment)
 * [Image Classification of ImageNet database with MXNet](Tutorials/Training-ResNet-on-ImageNet-with-MRS-and-GPU-VMs)
 
