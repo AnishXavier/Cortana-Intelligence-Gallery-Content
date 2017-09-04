@@ -112,7 +112,7 @@ In the following section we will show you how to deploy a [simplified version](h
 - Have the latest `Azure cli` installed and in your `PATH` environment variable.
 - Have `git` installed and in your `PATH`.
 - Register on the [NVIDIA cuDNN website](https://developer.nvidia.com/cudnn) to be able to use the cuDNN library, and download `cudnn64_70.dll`.
-- Download the code of a simplified version of the webapp [here](!https://mxnetstorage.blob.core.windows.net/public/nlp/NLPWebApp.zip) and unzip it. It contains the pre-trained model for sentiment analysis. The final result is visible [here](https://mxnetdeepapi.azurewebsites.net/).
+- Download the code of a simplified version of the webapp [here](https://mxnetstorage.blob.core.windows.net/public/nlp/NLPWebApp.zip) and unzip it. It contains the pre-trained model for sentiment analysis. The final result is visible [here](https://mxnetdeepapi.azurewebsites.net/).
 
 ### cuDNN
 

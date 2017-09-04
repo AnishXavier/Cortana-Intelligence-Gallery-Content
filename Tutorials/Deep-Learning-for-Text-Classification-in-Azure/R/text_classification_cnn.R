@@ -101,14 +101,14 @@ if(!file.exists(train.file.output)){
   text.encoder.csv(input.file=train.file.input, 
                    output.file=train.file.output, 
                    alphabet=alphabet, 
-                   max_text_lenght=feature.len,
+                   max.text.lenght=feature.len,
                    shuffle=TRUE)
 }
 if(!file.exists(test.file.output)){
   text.encoder.csv(input.file=test.file.input, 
                    output.file=test.file.output, 
                    alphabet=alphabet, 
-                   max_text_lenght=feature.len,
+                   max.text.lenght=feature.len,
                    shuffle=FALSE)
 }
 
